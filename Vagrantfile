@@ -5,6 +5,8 @@ Vagrant::Config.run do |config|
 
   #config.vm.boot_mode = :gui
   config.vm.share_folder "sss-client", "/tmp/sss-client", "sss-client"
+  config.vm.share_folder "java", "/swordpoc/java", "java"
+  config.vm.share_folder "downloads", "/downloads", "downloads"
   config.vm.forward_port 8080, 8888
 
   config.vm.customize ["modifyvm", :id, "--memory", 2048]
