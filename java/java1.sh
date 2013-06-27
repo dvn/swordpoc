@@ -1,3 +1,3 @@
 #!/bin/sh
-curl -s -H "X-On-Behalf-Of: obo" http://sword:sword@localhost:8080/swordpoc/servicedocument \
+curl --insecure -s -H "X-On-Behalf-Of: obo" https://sword:sword@localhost:8181/swordpoc/servicedocument \
 | xmllint --format -
