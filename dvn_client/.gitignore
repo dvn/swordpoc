@@ -1,0 +1,28 @@
+# Configuration Files #
+#######################
+*.conf
+config.py
+
+# private Files #
+#######################
+private.*
+
+
+# Compiled Python     #
+#######################
+*.py[cod]
+
+# Execution Byproducts #
+########################
+.cache
+
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
