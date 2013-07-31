@@ -74,7 +74,7 @@ class Dataverse(object):
                             payload = pkg,
                             mimetype = fileMimetype,
                             filename = filename,
-                            packaging = 'http://purl.org/net/sword/package/Binary')
+                            packaging = 'http://purl.org/net/sword/package/SimpleZip')
 
             study.lastDepositReceipt = depositReceipt
         
