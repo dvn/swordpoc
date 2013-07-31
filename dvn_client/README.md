@@ -2,15 +2,24 @@
 
 ###Requirements for dvn-client
 ----------------------------
+Note: you can also run this using the Vagrant file in the root of this repo. It has python 2.6, so be sure to include step 4.
 
-1. Python 2.7 (already on OSX)
+
+1. Python 2.6+
 2. gcc compiler (xcode + command line tools, or [standalone install](https://github.com/kennethreitz/osx-gcc-installer#readme))
 3. Get the lxml module for python: 
 
     `sudo easy_install lxml`
 
-4. Forked sword2 module for python:
+4. If your version of python < 2.7 get the argparse module: 
+
+    `sudo easy_install argparse`
+
+5. Forked sword2 module for python:
     1. Clone [forked repo python-client-sword2](https://github.com/pjbull/python-client-sword2)
+    
+        `git clone https://github.com/pjbull/python-client-sword2.git`
+    
     2. navigate to root folder for python-client-sword2
     
        `sudo python setup.py install`
@@ -64,4 +73,4 @@ If you are using a self-signed certificate, you may see an SSL error when you tr
 2. Go to: https://{SERVER}/dvn/api/data-deposit/swordv2/service-document
 3. Add Exception > View > Details > Export
 4. Save the PEM to the “resources” folder of the dvn\_client project
-5. When calling `Dataverse.connect()` or `Dataverse()` constructor, pass a path to this file as `cert=\[PATH\_TO\_CERTIFICATE\]`
+5. When calling `Dataverse.connect()` or `Dataverse()` constructor, pass a path to this file as `cert=[PATH_TO_CERTIFICATE]`
