@@ -5,10 +5,10 @@ __author__="peterbull"
 __date__ ="$Jul 30, 2013 12:13:10 PM$"
 
 PICS_OF_CATS_STUDY = {
-    "id" : "doesthismatter",
+    "id" : "1",
     "title" : "This Study is about Pictures of Cats",
-    "author" : "Sword Client",
+    "author" : "Peter Bull",
     "abstract" : "In this study we prove that there can be pictures of cats passed through the intertubes.",
 }
 
-PICS_OF_CATS_FILEPATH = "../resources/CatPictures.zip"
+PICS_OF_CATS_FILEPATH = "../resources/Archive.zip"
