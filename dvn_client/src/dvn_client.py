@@ -12,7 +12,7 @@ import json
 #downloaded modules
 
 #local modules
-from study import CreateStudyFromDict
+from study import Study
 from dataverse import Dataverse
 
 def parseArguments():
@@ -45,9 +45,10 @@ def main():
                         host=DEFAULT_HOST, 
                         cert=DEFAULT_CERT)
                         
-        s = CreateStudyFromDict(PICS_OF_CATS_STUDY)
+        s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
         dv.addStudy(s)
-        dv.addFileToStudy(s, PICS_OF_CATS_FILEPATH)
+        dv.replaceStudyContents(s, PICS_OF_CATS_FILEPATH)
+        print dv.getStudies()
         
     except Exception as e:
         print "Failed due to Exception: \n", e, e.args

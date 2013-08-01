@@ -2,13 +2,16 @@ __author__="peterbull"
 __date__ ="$Jul 30, 2013 12:32:24 PM$"
 
 # python base lib modules
+from lxml import etree
 import mimetypes
 import os
+import pprint
 
 #downloaded modules
 import sword2
 
 #local modules
+from study import Study
 
 class Dataverse(object):
     def __init__(self, username=None, password=None, host=None, cert=None):
@@ -24,7 +27,7 @@ class Dataverse(object):
         self.username = username
         self.password = password
         self.host = host
-        self.sdUri = "https://{host}/dvn/api/data-deposit/swordv2/service-document".format(host=self.host)
+        self.sdUri = "https://{host}/dvn/api/data-deposit/v1/swordv2/service-document".format(host=self.host)
         self.cert = cert
             
 #        print "Connecting to ", testSdUri
@@ -52,7 +55,24 @@ class Dataverse(object):
         depositReceipt = self.swordConnection.create(metadata_entry = study.entry,
                                                      col_iri=self.collection.href)
         study.lastDepositReceipt = depositReceipt
+        
+    def getStudies(self):
+        studiesResponse = self.swordConnection.get_resource(self.collection.href)
+        atomXml = studiesResponse.content
+        
+        rootElement = etree.XML(atomXml)
+        namespace = rootElement.nsmap[None] #get the namespace
+        rootTree = rootElement.getroottree() #need tree for find methods
+        
+        # get all the entry nodes and parse them into study objects
+        studies = []
+        for element in rootTree.findall("//{{{ns}}}entry".format(ns=namespace)):
+            s = Study.CreateStudyFromEntryElement(element)
+            studies.append(s)
             
+        return studies
+    
+    # TODO petbull: NYI in DVN
     def addFileToStudy(self, study, filepath):
         if not self.connected:
             raise Exception("Cannot add a file to a study until you call connect() on the Dataverse")
@@ -70,6 +90,32 @@ class Dataverse(object):
         print "FileName: ", filename
         
         with open(filepath, "rb") as pkg:
+            depositReceipt = self.swordConnection.append(dr = study.lastDepositReceipt,
+                            payload = pkg,
+                            mimetype = fileMimetype,
+                            filename = filename,
+                            packaging = 'http://purl.org/net/sword/package/SimpleZip')
+
+            study.lastDepositReceipt = depositReceipt
+            pprint.pprint(depositReceipt, indent=3)
+    
+    def replaceStudyContents(self, study, filepath):
+        if not self.connected:
+            raise Exception("Cannot add a file to a study until you call connect() on the Dataverse")
+        
+        # cannot add a file if the study has never been created on the dataverse
+        if not study.lastDepositReceipt:
+            self.addStudy(study)
+        
+        print "Replacing contents with file: ", filepath
+
+        fileMimetype = mimetypes.guess_type(filepath, strict=True)
+        print "MimeType: ", fileMimetype
+
+        filename = os.path.basename(filepath)
+        print "FileName: ", filename
+        
+        with open(filepath, "rb") as pkg:
             depositReceipt = self.swordConnection.update(dr = study.lastDepositReceipt,
                             payload = pkg,
                             mimetype = fileMimetype,
@@ -77,4 +123,4 @@ class Dataverse(object):
                             packaging = 'http://purl.org/net/sword/package/SimpleZip')
 
             study.lastDepositReceipt = depositReceipt
-        
+            pprint.pprint(depositReceipt.__dict__, indent=3)
