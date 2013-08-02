@@ -5,6 +5,16 @@ This repo is a Vagrant environment that supports spinning up two different imple
 1. Simple Sword Server (SSS), the reference implementation written in Python
 2. swordpoc, a very minimal implemention written in Java
 
+## Spinning up the Vagrant VM
+
+To use the Vagrant VM, install Vagrant from http://vagrantup.com and VirtualBox from http://virtualbox.org and run the following commands:
+
+    git clone https://github.com/dvn/swordpoc.git
+    git submodule init
+    git submodule update
+    vagrant up
+    vagrant ssh
+
 ## Running Simple Sword Server (SSS) in Vagrant
 
 In one of the steps below, we clone the code from https://github.com/swordapp/Simple-Sword-Server
