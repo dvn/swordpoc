@@ -13,6 +13,8 @@ class packages {
     'git',
     'vim-enhanced',
     'mlocate',
+    # for dvn_client
+    python-argparse,
   ]
 
   package { $packages_to_install:
