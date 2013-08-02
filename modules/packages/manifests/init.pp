@@ -12,6 +12,7 @@ class packages {
     'unzip',
     'git',
     'vim-enhanced',
+    'ack',
     'mlocate',
     # for dvn_client
     python-argparse,
