@@ -3,7 +3,6 @@ __date__ ="$Jul 30, 2013 12:32:24 PM$"
 
 # python base lib modules
 from lxml import etree
-import mimetypes
 import os
 import pprint
 
@@ -12,115 +11,48 @@ import sword2
 
 #local modules
 from study import Study
+import utils
 
 class Dataverse(object):
-    def __init__(self, username=None, password=None, host=None, cert=None):
-        self.swordConnection = None
-        self.connected = False
-        self.serviceDocument = None
-        
-        #Constructor can shortcut to connect
-        if (username and password and host):
-            self.connect(username, password, host, cert)
-        
-    def connect(self, username, password, host, cert=None):
-        self.username = username
-        self.password = password
-        self.host = host
-        self.sdUri = "https://{host}/dvn/api/data-deposit/v1/swordv2/service-document".format(host=self.host)
-        self.cert = cert
-            
-#        print "Connecting to ", testSdUri
-#        print "\t user: ", testUser
-#        print "\t pass: ", testPass
-#        print
+    def __init__(self, connection, collection):
+        self.connection = connection
+        self.collection = collection
 
-        self.swordConnection = sword2.Connection(self.sdUri, 
-                      user_name = self.username,
-                      user_pass=self.password, 
-                      ca_certs=self.cert)
-        
-        self.serviceDocument = self.swordConnection.get_service_document()
-
-        # TODO peterbull: Do we really always want to first collection & workspace?
-        _, workspace_1_collections = self.swordConnection.workspaces[0]
-        self.collection = workspace_1_collections[0]
-        
-        self.connected = True
-    
-    def addStudy(self, study):
-        if not self.connected:
-            raise Exception("Cannot add a study until you call connect() on the Dataverse")
-        
-        depositReceipt = self.swordConnection.create(metadata_entry = study.entry,
+    def add_study(self, study):        
+        depositReceipt = self.connection.swordConnection.create(metadata_entry = study.entry,
                                                      col_iri=self.collection.href)
+                                                     
+        study.hostDataverse = self
+        study.lastDepositReceipt = depositReceipt
+        print depositReceipt
+        
+    def delete_study(self, study):
+        depositReceipt = self.connection.swordConnection.delete(study.editUri)
         study.lastDepositReceipt = depositReceipt
         
-    def getStudies(self):
-        studiesResponse = self.swordConnection.get_resource(self.collection.href)
-        atomXml = studiesResponse.content
+    def delete_all_studies(self):
+        studies = self.get_studies()
+        for s in studies:
+            self.delete_study(s)
         
-        rootElement = etree.XML(atomXml)
-        namespace = rootElement.nsmap[None] #get the namespace
-        rootTree = rootElement.getroottree() #need tree for find methods
+    def get_studies(self):
+        studiesResponse = self.connection.swordConnection.get_resource(self.collection.href)
         
         # get all the entry nodes and parse them into study objects
         studies = []
-        for element in rootTree.findall("//{{{ns}}}entry".format(ns=namespace)):
-            s = Study.CreateStudyFromEntryElement(element)
+        for element in utils.get_elements(studiesResponse.content, tag="entry"):
+            s = Study.CreateStudyFromEntryElement(element, hostDataverse=self)
             studies.append(s)
             
         return studies
     
-    # TODO petbull: NYI in DVN
-    def addFileToStudy(self, study, filepath):
-        if not self.connected:
-            raise Exception("Cannot add a file to a study until you call connect() on the Dataverse")
+    def get_study_by_hdl(self, hdl):
+        studies = self.get_studies()
         
-        # cannot add a file if the study has never been created on the dataverse
-        if not study.lastDepositReceipt:
-            self.addStudy(study)
+        #TODO peterbull: Regex hdl to make sure it is a valid handle
         
-        print "Uploading file: ", filepath
-
-        fileMimetype = mimetypes.guess_type(filepath, strict=True)
-        print "MimeType: ", fileMimetype
-
-        filename = os.path.basename(filepath)
-        print "FileName: ", filename
-        
-        with open(filepath, "rb") as pkg:
-            depositReceipt = self.swordConnection.append(dr = study.lastDepositReceipt,
-                            payload = pkg,
-                            mimetype = fileMimetype,
-                            filename = filename,
-                            packaging = 'http://purl.org/net/sword/package/SimpleZip')
-
-            study.lastDepositReceipt = depositReceipt
-            pprint.pprint(depositReceipt, indent=3)
-    
-    def replaceStudyContents(self, study, filepath):
-        if not self.connected:
-            raise Exception("Cannot add a file to a study until you call connect() on the Dataverse")
-        
-        # cannot add a file if the study has never been created on the dataverse
-        if not study.lastDepositReceipt:
-            self.addStudy(study)
-        
-        print "Replacing contents with file: ", filepath
-
-        fileMimetype = mimetypes.guess_type(filepath, strict=True)
-        print "MimeType: ", fileMimetype
-
-        filename = os.path.basename(filepath)
-        print "FileName: ", filename
-        
-        with open(filepath, "rb") as pkg:
-            depositReceipt = self.swordConnection.update(dr = study.lastDepositReceipt,
-                            payload = pkg,
-                            mimetype = fileMimetype,
-                            filename = filename,
-                            packaging = 'http://purl.org/net/sword/package/SimpleZip')
-
-            study.lastDepositReceipt = depositReceipt
-            pprint.pprint(depositReceipt.__dict__, indent=3)
+        for s in studies:
+            if hdl in s.editUri:
+                return s
+            
+        return None

@@ -11,4 +11,6 @@ PICS_OF_CATS_STUDY = {
     "abstract" : "In this study we prove that there can be pictures of cats passed through the intertubes.",
 }
 
-PICS_OF_CATS_FILEPATH = "../resources/Archive.zip"
+PICS_OF_CATS_FILEPATH = "../resources/sword_ingest.zip"
+
+ADD_PIC_OF_CAT = "../resources/cat.jpg"

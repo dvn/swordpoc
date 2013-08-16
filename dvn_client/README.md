@@ -74,3 +74,47 @@ If you are using a self-signed certificate, you may see an SSL error when you tr
 3. Add Exception > View > Details > Export
 4. Save the PEM to the “resources” folder of the dvn\_client project
 5. When calling `Dataverse.connect()` or `Dataverse()` constructor, pass a path to this file as `cert=[PATH_TO_CERTIFICATE]`
+
+
+###Examples:
+---------------------------------
+Create a study:
+```python
+
+    PICS_OF_CATS_STUDY = {
+    "title" : "This Study is about Pictures of Cats",
+    "author" : "Peter Bull",
+    "abstract" : "In this study we prove that there can be pictures of cats passed through the intertubes.",
+    }
+    
+    s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
+
+    dv = Dataverse(username=DEFAULT_USERNAME,
+                        password=DEFAULT_PASSWORD, 
+                        host=DEFAULT_HOST, 
+                        cert=DEFAULT_CERT)
+                        
+
+    dv.addStudy(s)
+
+```
+
+Deposit data into a study
+
+List studies in a dataverse
+
+Display a study atom entry (contains data citation (bibliographicCitation) statement uri, isReleased state, and isInDraft state)
+
+Display a study statement (contains feed of file entries)
+
+Delete a study
+
+Replacing cataloging information (title, author, etc.) for a study
+
+Add files to a study
+
+Delete a file by database id
+
+Replace all files on a study with a new zip file
+
+Release a study

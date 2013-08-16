@@ -5,15 +5,23 @@
 __author__="peterbull"
 __date__ ="$Jul 29, 2013 1:38:57 PM$"
 
+# enable logging for sword commands
+import logging
+logging.basicConfig()
+
 # python base lib modules
 import argparse
 import json
+import pprint
+from time import sleep
+import traceback
 
 #downloaded modules
 
 #local modules
 from study import Study
 from dataverse import Dataverse
+from connection import DvnConnection
 
 def parseArguments():
     parser = argparse.ArgumentParser(description='dvn_client exercises the APIs available for a DataVerse Network')
@@ -40,25 +48,43 @@ def main():
     
     dv = None #declare outside so except clause has access
     try:
-        dv = Dataverse( username=DEFAULT_USERNAME,
+        dvc = DvnConnection(username=DEFAULT_USERNAME,
                         password=DEFAULT_PASSWORD, 
                         host=DEFAULT_HOST, 
                         cert=DEFAULT_CERT)
                         
-        s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
-        dv.addStudy(s)
-        dv.replaceStudyContents(s, PICS_OF_CATS_FILEPATH)
-        print dv.getStudies()
+        
+        dv = dvc.get_dataverses()[0]
+      
+        dv.delete_all_studies()
+        
+        #s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
+        s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
+        dv.add_study(s)
+        s.add_files([ADD_PIC_OF_CAT], replaceStudyContents=True)
+        
+        #firstStudy = dv.get_study_by_hdl("PA0CT")
+        #print firstStudy
+        #print firstStudy.get_list_of_files()
+        #dv.delete_study(firstStudy)
+        #dv.deleteStudy(firstStudy)
+        #dv.addFileToStudy(firstStudy, ADD_PIC_OF_CAT)
+        #dv.addFileToStudy(s, ADD_PIC_OF_CAT)
+        
+        #print json.dumps(dv.swordConnection.history, indent=True)
+        print "\n\ndvn_client succeeded"
+        #raise Exception("")
         
     except Exception as e:
-        print "Failed due to Exception: \n", e, e.args
+        sleep(1)
+        traceback.print_exc()
+        sleep(1)
         if dv:
             try:
-                dv.swordConnection.history = json.dumps(sdv.swordConnection.history, indent=True)
+                dv.swordConnection.history = json.dumps(dv.connection.swordConnection.history, indent=True)
             except:
                 pass
-            print "Call History:\n", dv.swordConnection.history
-        raise e
+            print "Call History:\n", dv.connection.swordConnection.history
 
 if __name__ == "__main__":
     main()
