@@ -1,7 +1,6 @@
 __author__="peterbull"
 __date__ ="$Aug 16, 2013 12:07:48 PM$"
 
-import traceback
 import lxml
         
 # factor out xpath operations so we don't have to look at its ugliness all

@@ -120,7 +120,7 @@ class Study(object):
 
         # if we have more than one file, or one file that is not a zip, we need to zip it
         if len(filepaths) != 1 or mimetypes.guess_type(filepaths[0], strict=True) != "application/zip":
-            filepath = self._zipFiles(filepaths)
+            filepath = self._zip_files(filepaths)
             deleteAfterUpload = True
         else:
             filepath = filepaths[0]
@@ -131,15 +131,16 @@ class Study(object):
         with open(filepath, "rb") as pkg:
             if not replaceStudyContents:
                 depositReceipt = self.hostDataverse.connection.swordConnection.append(dr = self.lastDepositReceipt,
-                                se_iri = self.editMediaUri,
+                                se_iri = self.editMediaUri if self.editMediaUri else self.lastDepositReceipt.edit_media,
                                 payload = pkg,
                                 mimetype = fileMimetype,
                                 filename = filename,
                                 packaging = 'http://purl.org/net/sword/package/SimpleZip')
             else:
+                print "WARNING: at the moment, replacing study contents is not supported server-side. This call will fail until that changes. See https://redmine.hmdc.harvard.edu/issues/3108"
                 depositReceipt = self.hostDataverse.connection.swordConnection.update(dr = self.lastDepositReceipt,
-                            #edit_iri = self.editUri,
-                            #edit_media_iri = self.editMediaUri,
+                            edit_iri = self.editUri,
+                            edit_media_iri = self.editMediaUri,
                             payload = pkg,
                             mimetype = fileMimetype,
                             filename = filename,
@@ -152,8 +153,8 @@ class Study(object):
             print "Deleting temporary zip file: ", filepath
             os.remove(filepath)    
             
-    def _zipFiles(self, filesToZip, pathToStoreZip=None):
-        zipFilePath = os.path.join(os.getenv("TEMP", "/tmp"),  "swordUploadPackage.zip") if not pathToStoreZip else pathToStoreZip
+    def _zip_files(self, filesToZip, pathToStoreZip=None):
+        zipFilePath = os.path.join(os.getenv("TEMP", "/tmp"),  "temp_dvn_upload.zip") if not pathToStoreZip else pathToStoreZip
         
         with ZipFile(zipFilePath, 'w') as zipFile:
             for fileToZip in filesToZip:

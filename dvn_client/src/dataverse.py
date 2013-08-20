@@ -2,12 +2,8 @@ __author__="peterbull"
 __date__ ="$Jul 30, 2013 12:32:24 PM$"
 
 # python base lib modules
-from lxml import etree
-import os
-import pprint
 
 #downloaded modules
-import sword2
 
 #local modules
 from study import Study

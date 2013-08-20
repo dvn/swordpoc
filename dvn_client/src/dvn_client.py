@@ -1,6 +1,7 @@
 # DVN client for SWORD API
 # Prereqs: Python, sword2 Module (available using easy_install)
 # Adapted from: https://bitbucket.org/beno/python-sword2/wiki/Quickstart
+# 
 
 __author__="peterbull"
 __date__ ="$Jul 29, 2013 1:38:57 PM$"
@@ -12,7 +13,6 @@ logging.basicConfig()
 # python base lib modules
 import argparse
 import json
-import pprint
 from time import sleep
 import traceback
 
@@ -20,10 +20,9 @@ import traceback
 
 #local modules
 from study import Study
-from dataverse import Dataverse
 from connection import DvnConnection
 
-def parseArguments():
+def parse_arguments():
     parser = argparse.ArgumentParser(description='dvn_client exercises the APIs available for a DataVerse Network')
     
     # TODO peterbull: add arguments 
@@ -38,7 +37,7 @@ def parseArguments():
 
 def main():
     # Get the command line arguments.
-    args = parseArguments()
+    args = parse_arguments()
     
     # TODO peterbull: only do this if running tests
     # Load configuration values, e.g., DEFAULT_USERNAME stored in separate .py 
@@ -56,12 +55,13 @@ def main():
         
         dv = dvc.get_dataverses()[0]
       
+        # clean up the test dataverse
         dv.delete_all_studies()
         
         #s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
         s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
         dv.add_study(s)
-        s.add_files([ADD_PIC_OF_CAT], replaceStudyContents=True)
+        s.add_files([ADD_PIC_OF_CAT])
         
         #firstStudy = dv.get_study_by_hdl("PA0CT")
         #print firstStudy
