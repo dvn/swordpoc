@@ -34,10 +34,15 @@ class Dataverse(object):
         depositReceipt = self.connection.swordConnection.delete(study.editUri)
         study.isDeleted = True
         
-    def delete_all_studies(self):
-        studies = self.get_studies()
-        for s in studies:
-            self.delete_study(s)
+    def delete_all_studies(self, bigHammer=False):
+        # big hammer deletes all of the contents of a dataverse. this is dev only
+        # code that will be removed before release and big hammer will stop working
+        if bigHammer:
+            self.connection.swordConnection.delete(self.collection.href)
+        else:
+            studies = self.get_studies()
+            for s in studies:
+                self.delete_study(s)
         
     def get_studies(self):
         studiesResponse = self.connection.swordConnection.get_resource(self.collection.href)

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+https://github.com/IQSS/dvn/blob/develop/tools/scripts/data-deposit-api/atom-entry-study.xml
+
+comments at https://docs.google.com/document/d/1Rn70XItfA6_mJ4JA3I7m4em0spfdXIIHhwkrgCl40uE/edit?usp=sharing
+-->
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:dcterms="http://purl.org/dc/terms/">
+   <title>The first study for the New England Journal of Coffee dataverse</title>
+   <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+   <updated>2005-10-07T17:17:08Z</updated>
+   <author><name>Creator</name></author>
+   <summary type="text">The abstract</summary>
+   <!-- some embedded metadata -->
+   <dcterms:title>Roasting at Home</dcterms:title>
+   <dcterms:creator>Peets, John</dcterms:creator>
+   <dcterms:creator>Stumptown, Jane</dcterms:creator>
+   <!-- FIXME: is this productionDate or distributionDate? -->
+   <dcterms:date>2013-07-11</dcterms:date>
+   <dcterms:rights>Creative Commons CC-BY 3.0 (unported) http://creativecommons.org/licenses/by/3.0/</dcterms:rights>
+   <!-- This field does not exist in our DVN DDI-DC crosswalk but would be useful to make sure we have the OJS Journal article citation -->
+   <dcterms:bibliographicCitation>Insert Journal Article Citation from OJS</dcterms:bibliographicCitation>
+   <dcterms:description>Considerations before you start roasting your own coffee at home.</dcterms:description>
+   <!-- In DVN we also use "description" to include "Data Citation" but how would OJS get the study's Data Citation since Dataverse would need to pass this information over to OJS rather than the other way around. -->
+   <!-- In DVN we use identifier to place the Handle in but how would this work with OJS? What Identifier would go there? -->
+   <dcterms:identifier>doi:10.1000/182</dcterms:identifier>
+   <dcterms:subject>coffee</dcterms:subject>
+   <dcterms:subject>beverage</dcterms:subject>
+   <dcterms:subject>caffeine</dcterms:subject>
+</entry>

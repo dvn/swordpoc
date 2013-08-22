@@ -6,6 +6,7 @@ __date__ ="$Aug 21, 2013 2:56:25 PM$"
 
 import os
 import sys
+from time import sleep
 import unittest
 
 
@@ -33,12 +34,12 @@ class TestStudyOperations(unittest.TestCase):
         self.dv = self.dvc.get_dataverses()[0]
         
         print "Removing any existing studies."
-        self.dv.delete_all_studies()
+        #self.dv.delete_all_studies()
         
     def setUp(self):
         #runs before each test method
         
-        #create a study for the test
+        #create a study for each test
         s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
         self.dv.add_study(s)
         
@@ -55,13 +56,29 @@ class TestStudyOperations(unittest.TestCase):
         
     def test_add_files_to_study(self):
         self.s.add_files([INGEST_FILES])
-        print self.s.get_list_of_files()
+        self.s.get_list_of_files()
         
     def test_release_study(self):
         s = self.dv.get_study_by_string_in_entry(PICS_OF_CATS_STUDY["title"])
+        assertTrue(s.get_state() == "DRAFT")
         s.release()
-        self.dv.delete_study(s)
-
+        assertTrue(s.get_state() == "RELEASED")
+        self.dv.delete_study(s) #this should deaccession
+        assertTrue(s.get_state() == "DEACCESSIONED")
+        
+        
+    def test_create_study_from_xml(self):
+        xmlStudy = Study.CreateStudyFromAtomEntryXmlFile(ATOM_STUDY)
+        self.dv.add_study(xmlStudy)
+        self.s = self.dv.get_study_by_string_in_entry("The first study for the New England Journal of Coffee dataverse")
+        self.assertTrue(self.s)
+        
+    def test_ingest(self):
+        self.s.add_files([INGEST_FILES])
+        sleep(3) #wait for ingest`
+        print self.s.get_files()
+        
+    
 if __name__ == "__main__":
     __file__ = sys.argv[0]
     suite = unittest.TestLoader().loadTestsFromTestCase(TestStudyOperations)
