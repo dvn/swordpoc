@@ -5,6 +5,7 @@ __date__ ="$Jul 30, 2013 12:32:24 PM$"
 import pprint
 
 #downloaded modules
+from lxml import etree
 
 #local modules
 from study import Study
@@ -34,7 +35,7 @@ class Dataverse(object):
         depositReceipt = self.connection.swordConnection.delete(study.editUri)
         study.isDeleted = True
         
-    def delete_all_studies(self, bigHammer=False):
+    def delete_all_studies(self, bigHammer=False, ignoreExceptions=False):
         # big hammer deletes all of the contents of a dataverse. this is dev only
         # code that will be removed before release and big hammer will stop working
         if bigHammer:
@@ -42,7 +43,11 @@ class Dataverse(object):
         else:
             studies = self.get_studies()
             for s in studies:
-                self.delete_study(s)
+                try:
+                    self.delete_study(s)
+                except Exception as e:
+                    if not ignoreExceptions:
+                        raise e
         
     def get_studies(self):
         studiesResponse = self.connection.swordConnection.get_resource(self.collection.href)

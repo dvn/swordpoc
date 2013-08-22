@@ -43,4 +43,10 @@ xpath='{xp}'
 xml=
 {xml}""".format(e=e, xp=xpath, xml=etree.tostring(rootElement, pretty_print=True))
     
-    return (elements[0] if len(elements) == 1 else elements)
+    retVal = elements
+    if len(elements) == 1 and numberOfElements == 1:
+        retVal = elements[0]
+    elif len(elements) == 0 and numberOfElements:
+        retVal = None
+    
+    return retVal

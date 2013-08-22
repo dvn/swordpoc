@@ -45,6 +45,10 @@ Right now, we only run with settings from the tests.py file. Feel free to edit t
 2. Run the client:
 
     `python dvn_client.py --config config.py --runTests tests.py`
+    
+3. To run the tests, run this command (for more options see [unittest](http://docs.python.org/2/library/unittest.html#assert-methods))
+
+    `python dvn_test.py`
 
 
 ###Setup the Python Project in NetBeans (7.3.1)
@@ -78,6 +82,19 @@ If you are using a self-signed certificate, you may see an SSL error when you tr
 
 ###Examples:
 ---------------------------------
+Prereq for all of these is to get a dataverse:
+```python
+
+    dvc = DvnConnection(username=DEFAULT_USERNAME,
+                        password=DEFAULT_PASSWORD, 
+                        host=DEFAULT_HOST, 
+                        cert=DEFAULT_CERT)
+                        
+        
+    dvs = dvc.get_dataverses()
+    dv = dvs[0]    
+```
+
 Create a study:
 ```python
 
@@ -88,33 +105,89 @@ Create a study:
     }
     
     s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
-
-    dv = Dataverse(username=DEFAULT_USERNAME,
-                        password=DEFAULT_PASSWORD, 
-                        host=DEFAULT_HOST, 
-                        cert=DEFAULT_CERT)
-                        
-
-    dv.addStudy(s)
-
+    dv.add_study(s)
+    
 ```
 
-Deposit data into a study
+Add files to a study with a zip file
 
-List studies in a dataverse
+```python
 
-Display a study atom entry (contains data citation (bibliographicCitation) statement uri, isReleased state, and isInDraft state)
+    study = dv.get_studies()[0]
+    study.add_file("path_to_zip")
+    
+```
+
+Display a study atom entry (contains data citation (bibliographicCitation) statement uri, latestVersionState)
+
+```python
+
+    study = dv.get_studies()[0]
+    study.add_file("path_to_zip")
+    
+```
 
 Display a study statement (contains feed of file entries)
 
-Delete a study
+```python
 
-Replacing cataloging information (title, author, etc.) for a study
-
-Add files to a study
+    study = dv.get_studies()[0]
+    study.get_statement()
+    
+```
 
 Delete a file by database id
 
-Replace all files on a study with a new zip file
+```python
+
+    study = dv.get_studies()[0]
+    file = study.get_files()[0]
+    study.delete_file(file)
+    
+```
+
+Replacing cataloging information (title, author, etc.) for a study
+
+List studies in a dataverse
+
+```python
+
+    for s in dv.get_studies():
+    	print s
+    
+```
+
+Delete a study (non-released studies only)
+
+```python
+
+    study = dv.get_studies()[0]
+	dv.delete_study(study)
+    
+```
+
+Deaccession a study (released studies only)
+
+```python
+
+    study = dv.get_studies()[0]
+    study.release()
+	dv.delete_study(study)
+    
+```
 
 Release a study
+
+```python
+
+    study = dv.get_studies()[0]
+    study.release()
+    
+```
+
+Determine if a dataverse has been released (dataverseHasBeenReleased boolean)
+```python
+
+    dv.is_released()
+    
+```

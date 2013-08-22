@@ -26,7 +26,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='dvn_client exercises the APIs available for a DataVerse Network')
     
     # TODO peterbull: add arguments 
-    # For manual connection
+    # For manual connection2
 #    parser.add_argument('action', choices=['create','upload'], default=None, help='Description for foo argument')
 #    parser.add_argument('-u','--username', default=None, help='Description for foo argument')
 #    parser.add_argument('-p','--password', default=None, help='Description for bar argument')
@@ -52,33 +52,35 @@ def main():
                         
         
         dvs = dvc.get_dataverses()
+        for dv in dvs:
+            print dv
             
         
-        dv = dvs[0]
+        #dv = dvs[0]
       
-        # clean up the test dataverse
-        #dv.delete_all_studies()
-        print "RELEASED: ", dv.is_released()
-        
-        #s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
-        s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
-        dv.add_study(s)
-        s.add_files([INGEST_FILES])
-        print s.get_citation()
-        print s.get_state()
-        
-        sleep(3) #wait for ingest`
-        
-        fs = s.get_files()
-        print "FILES: ", len(fs)
-        s.delete_file(fs[-1])
-        fs = s.get_files()
-        print "FILES: ", len(fs)
-        s.delete_all_files()
-        fs = s.get_files()
-        print "FILES: ", len(fs)
-        
-        s.release()
+#        # clean up the test dataverse
+#        #dv.delete_all_studies()
+#        print "RELEASED: ", dv.is_released()
+#        
+#        #s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
+#        s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
+#        dv.add_study(s)
+#        s.add_files([INGEST_FILES])
+#        print s.get_citation()
+#        print s.get_state()
+#        
+#        sleep(3) #wait for ingest`
+#        
+#        fs = s.get_files()
+#        print "FILES: ", len(fs)
+#        s.delete_file(fs[-1])
+#        fs = s.get_files()
+#        print "FILES: ", len(fs)
+#        s.delete_all_files()
+#        fs = s.get_files()
+#        print "FILES: ", len(fs)
+#        
+#        s.release()
         
         print "\n\ndvn_client succeeded"
         

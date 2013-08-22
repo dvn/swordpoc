@@ -19,7 +19,7 @@ from file import DvnFile
 import utils
 
 class Study(object):
-    def __init__(self, title, id=None, author=None, abstract=None, editUri=None, editMediaUri=None, hostDataverse=None, atomEntryXml=None):
+    def __init__(self, title, id=None, author=None, abstract=None, editUri=None, editMediaUri=None, statementUri=None, hostDataverse=None, atomEntryXml=None):
             # Create SWORD Entry with Metadata for study
             self.entry = sword2.Entry(atomEntryXml=atomEntryXml,
                       id=id,
@@ -35,6 +35,7 @@ class Study(object):
             
             self.editUri = editUri
             self.editMediaUri = editMediaUri
+            self.statementUri = statementUri
             
             self.hostDataverse = hostDataverse # generally used for sword connection
             
@@ -95,6 +96,15 @@ class Study(object):
                    hostDataverse=hostDataverse)  # edit-media iri
                    
     def get_statement(self):
+        if not self.statementUri:
+            atomXml = self.get_entry()
+            statementLink = utils.get_elements(atomXml, 
+                                               tag="link", 
+                                               attribute="rel", 
+                                               attributeValue="http://purl.org/net/sword/terms/statement", 
+                                               numberOfElements=1)
+            self.statementUri = statementLink.get("href")
+        
         studyStatement = self.hostDataverse.connection.swordConnection.get_resource(self.statementUri).content
         return studyStatement
     
@@ -119,6 +129,9 @@ class Study(object):
             files.append(f)
         
         return files
+        
+    def add_file(self, file, replaceStudyContents=False):
+        self.add_files([file], replaceStudyContents)
 
     def add_files(self, filepaths, replaceStudyContents=False):        
         print "Uploading files: ", filepaths
@@ -186,6 +199,10 @@ class Study(object):
     
     def get_state(self):
         return utils.get_elements(self.get_statement(), tag="category", attribute="term", attributeValue="latestVersionState", numberOfElements=1).text
+    
+    def get_id(self):
+        urlPieces = self.editMediaUri.rsplit("/")
+        return '/'.join([urlPieces[-2], urlPieces[-1]])
     
     def _zip_files(self, filesToZip, pathToStoreZip=None):
         zipFilePath = os.path.join(os.getenv("TEMP", "/tmp"),  "temp_dvn_upload.zip") if not pathToStoreZip else pathToStoreZip
