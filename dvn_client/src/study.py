@@ -95,11 +95,15 @@ class Study(object):
                    hostDataverse=hostDataverse)  # edit-media iri
                    
     def get_statement(self):
+        studyStatement = self.hostDataverse.connection.swordConnection.get_resource(self.statementUri).content
+        return studyStatement
+    
+    def get_entry(self):
         studyStatement = self.hostDataverse.connection.swordConnection.get_resource(self.editUri).content
         return studyStatement
     
     def get_files(self):
-        atomXml = self.get_statement()
+        atomXml = self.get_entry()
         statementLink = utils.get_elements(atomXml, 
                                            tag="link", 
                                            attribute="rel", 
@@ -178,7 +182,10 @@ class Study(object):
             self.delete_file(f)
         
     def get_citation(self):
-        return utils.get_elements(self.get_statement(), namespace="http://purl.org/dc/terms/", tag="bibliographicCitation", numberOfElements=1).text
+        return utils.get_elements(self.get_entry(), namespace="http://purl.org/dc/terms/", tag="bibliographicCitation", numberOfElements=1).text
+    
+    def get_state(self):
+        return utils.get_elements(self.get_statement(), tag="category", attribute="term", attributeValue="latestVersionState", numberOfElements=1).text
     
     def _zip_files(self, filesToZip, pathToStoreZip=None):
         zipFilePath = os.path.join(os.getenv("TEMP", "/tmp"),  "temp_dvn_upload.zip") if not pathToStoreZip else pathToStoreZip
@@ -194,5 +201,6 @@ class Study(object):
     def _refresh(self, dr=None):
         self.editUri = dr.edit if dr else self.editUri
         self.editMediaUri = dr.edit_media if dr else self.editMediaUri
-        self.entry = sword2.Entry(atomEntryXml=self.get_statement())
+        self.statementUri = dr.atom_statement_iri if dr else self.statementUri
+        self.entry = sword2.Entry(atomEntryXml=self.get_entry())
    

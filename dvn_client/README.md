@@ -2,7 +2,7 @@
 
 ###Requirements for dvn-client
 ----------------------------
-Note: you can also run this using the Vagrant file in the root of this repo.
+Note: you can also run this using the Vagrant file in the root of this repo. The init.pp includes steps 1-5 below, so if you use that image you can skip to "Setting up a config"
 
 
 1. Python 2.6+

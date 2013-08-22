@@ -64,9 +64,10 @@ def main():
         s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
         dv.add_study(s)
         s.add_files([INGEST_FILES])
-        s.get_citation()
+        print s.get_citation()
+        print s.get_state()
         
-        sleep(10) #wait for ingest`
+        sleep(3) #wait for ingest`
         
         fs = s.get_files()
         print "FILES: ", len(fs)
