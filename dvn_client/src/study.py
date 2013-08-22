@@ -15,6 +15,7 @@ from lxml import etree
 import sword2
 
 #local modules
+from file import DvnFile
 import utils
 
 class Study(object):
@@ -93,12 +94,12 @@ class Study(object):
                    editMediaUri=editMediaLink,
                    hostDataverse=hostDataverse)  # edit-media iri
                    
-    def get_study_statement(self):
+    def get_statement(self):
         studyStatement = self.hostDataverse.connection.swordConnection.get_resource(self.editUri).content
         return studyStatement
     
-    def get_list_of_files(self):
-        atomXml = self.get_study_statement()
+    def get_files(self):
+        atomXml = self.get_statement()
         statementLink = utils.get_elements(atomXml, 
                                            tag="link", 
                                            attribute="rel", 
@@ -108,10 +109,12 @@ class Study(object):
 
         atomStatement = self.hostDataverse.connection.swordConnection.get_atom_sword_statement(studyStatementLink)
         
+        files = []
         for res in atomStatement.resources:
-            print etree.tostring(res.dom, pretty_print=True)
+            f = DvnFile.CreateFromAtomStatementObject(res, self)
+            files.append(f)
         
-        return atomStatement.resources
+        return files
 
     def add_files(self, filepaths, replaceStudyContents=False):        
         print "Uploading files: ", filepaths
@@ -119,7 +122,7 @@ class Study(object):
         deleteAfterUpload = False
 
         # if we have more than one file, or one file that is not a zip, we need to zip it
-        if len(filepaths) != 1 or mimetypes.guess_type(filepaths[0], strict=True) != "application/zip":
+        if len(filepaths) != 1 or mimetypes.guess_type(filepaths[0])[0] != "application/zip":
             filepath = self._zip_files(filepaths)
             deleteAfterUpload = True
         else:
@@ -131,7 +134,7 @@ class Study(object):
         with open(filepath, "rb") as pkg:
             if not replaceStudyContents:
                 depositReceipt = self.hostDataverse.connection.swordConnection.append(dr = self.lastDepositReceipt,
-                                se_iri = self.editMediaUri if self.editMediaUri else self.lastDepositReceipt.edit_media,
+                                se_iri = self.editMediaUri,
                                 payload = pkg,
                                 mimetype = fileMimetype,
                                 filename = filename,
@@ -146,20 +149,50 @@ class Study(object):
                             filename = filename,
                             packaging = 'http://purl.org/net/sword/package/SimpleZip')
 
-            self.lastDepositReceipt = depositReceipt
-            pprint.pprint(depositReceipt, indent=3)
+            self._refresh(dr=depositReceipt)
         
         if deleteAfterUpload:
             print "Deleting temporary zip file: ", filepath
             os.remove(filepath)    
-            
+    
+    def update_metadata(self):
+        #todo: consumer has to use the methods on self.entry (from sword2.atom_objects) to update the
+        # metadata before calling this method. that's a little cumbersome...
+        depositReceipt = self.hostDataverse.connection.swordConnection.update(dr = self.lastDepositReceipt,
+                            edit_iri = self.editUri,
+                            edit_media_iri = self.editMediaUri,
+                            metadata_entry = self.entry)
+        self._refresh(dr=depositReceipt)
+    
+    def release(self):
+        self.lastDepositReceipt = self.hostDataverse.connection.swordConnection.complete_deposit(dr = self.lastDepositReceipt,
+                                                                              se_iri = self.editUri)
+        self._refresh(dr=self.lastDepositReceipt)
+    
+    def delete_file(self, dvnFile):
+        depositReceipt = self.hostDataverse.connection.swordConnection.delete(dvnFile.editMediaUri)
+        self._refresh(dr=self.lastDepositReceipt)
+        
+    def delete_all_files(self):
+        for f in self.get_files():
+            self.delete_file(f)
+        
+    def get_citation(self):
+        return utils.get_elements(self.get_statement(), namespace="http://purl.org/dc/terms/", tag="bibliographicCitation", numberOfElements=1).text
+    
     def _zip_files(self, filesToZip, pathToStoreZip=None):
         zipFilePath = os.path.join(os.getenv("TEMP", "/tmp"),  "temp_dvn_upload.zip") if not pathToStoreZip else pathToStoreZip
         
-        with ZipFile(zipFilePath, 'w') as zipFile:
-            for fileToZip in filesToZip:
-                zipFile.write(fileToZip)
+        zipFile = ZipFile(zipFilePath, 'w')
+        for fileToZip in filesToZip:
+            zipFile.write(fileToZip)
+        zipFile.close()
             
         return zipFilePath
-                   
+    
+    # if we perform a server operation, we should refresh the study object
+    def _refresh(self, dr=None):
+        self.editUri = dr.edit if dr else self.editUri
+        self.editMediaUri = dr.edit_media if dr else self.editMediaUri
+        self.entry = sword2.Entry(atomEntryXml=self.get_statement())
    

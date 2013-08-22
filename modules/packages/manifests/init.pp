@@ -16,10 +16,16 @@ class packages {
     'mlocate',
     # for dvn_client
     python-argparse,
+    python-lxml
   ]
 
   package { $packages_to_install:
     ensure => installed,
   }
 
+    exec {"install swordv2 python client":
+	path	=>	"/bin:/usr/bin",
+	command	=>	"git clone https://github.com/pjbull/python-client-sword2.git /swordv2 && cd /swordv2 && python setup.py install",
+	provider => "shell"
+  }
 }

@@ -1,7 +1,7 @@
 __author__="peterbull"
 __date__ ="$Aug 16, 2013 12:07:48 PM$"
 
-import lxml
+from lxml import etree
         
 # factor out xpath operations so we don't have to look at its ugliness all
 # over the place
@@ -9,13 +9,15 @@ def get_elements(rootElement, tag=None, namespace=None, attribute=None, attribut
     #except either an lxml.Element or a string of xml
     #if a string, convert to etree element
     if isinstance(rootElement, str):
-        rootElement = lxml.etree.XML(rootElement)
+        rootElement = etree.XML(rootElement)
     
-    if not namespace:
+    if namespace == None:
         namespace = rootElement.nsmap[None]
     
     if not tag:
         xpath = "*"
+    elif namespace == "":
+        xpath = tag
     else:
         xpath = "{{{ns}}}{tg}".format(ns=namespace, tg=tag)
     
@@ -28,13 +30,9 @@ def get_elements(rootElement, tag=None, namespace=None, attribute=None, attribut
     
     elements = None
     try:
-        #if we know we're looking for one, return that element instead of a list
-        if numberOfElements == 1:
-            elements = rootElement.find(xpath)
-        else:
-            elements = rootElement.findall(xpath)
+        elements = rootElement.findall(xpath)
         
-        if numberOfElements and numberOfElements != 1 and len(elements) != numberOfElements:
+        if numberOfElements and len(elements) != numberOfElements:
             raise Exception("Wrong number of elements found. Expected {0} and found {1}.".format(numberOfElements, len(elements)))
         
     except Exception as e:
@@ -43,6 +41,6 @@ Exception thrown trying to get_elements with the following parameters:
 exp='{e}'
 xpath='{xp}'
 xml=
-{xml}""".format(e=e, xp=xpath, xml=lxml.etree.tostring(rootElement, pretty_print=True))
+{xml}""".format(e=e, xp=xpath, xml=etree.tostring(rootElement, pretty_print=True))
     
-    return elements
+    return (elements[0] if len(elements) == 1 else elements)

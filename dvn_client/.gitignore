@@ -1,7 +1,7 @@
 # Configuration Files #
 #######################
 *.conf
-config.py
+config*.py
 
 # private Files #
 #######################
@@ -21,6 +21,7 @@ private.*
 ######################
 .DS_Store
 .DS_Store?
+.DS*
 ._*
 .Spotlight-V100
 .Trashes

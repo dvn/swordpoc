@@ -8,7 +8,7 @@ __date__ ="$Jul 29, 2013 1:38:57 PM$"
 
 # enable logging for sword commands
 import logging
-logging.basicConfig()
+logging.basicConfig(level=logging.ERROR)
 
 # python base lib modules
 import argparse
@@ -39,11 +39,9 @@ def main():
     # Get the command line arguments.
     args = parse_arguments()
     
-    # TODO peterbull: only do this if running tests
-    # Load configuration values, e.g., DEFAULT_USERNAME stored in separate .py 
-    # file.
-    execfile(args.config, globals())
-    execfile(args.runTests, globals())
+    if args.runTests and args.config:
+        execfile(args.config, globals())
+        execfile(args.runTests, globals())
     
     dv = None #declare outside so except clause has access
     try:
@@ -53,27 +51,35 @@ def main():
                         cert=DEFAULT_CERT)
                         
         
-        dv = dvc.get_dataverses()[0]
+        dvs = dvc.get_dataverses()
+            
+        
+        dv = dvs[0]
       
         # clean up the test dataverse
-        dv.delete_all_studies()
+        #dv.delete_all_studies()
+        print "RELEASED: ", dv.is_released()
         
         #s = Study.CreateStudyFromDict(PICS_OF_CATS_STUDY)
         s = Study.CreateStudyFromAtomEntryXmlFile("/Users/peterbull/NetBeansProjects/dvn/tools/scripts/data-deposit-api/atom-entry-study.xml")
         dv.add_study(s)
-        s.add_files([ADD_PIC_OF_CAT])
+        s.add_files([INGEST_FILES])
+        s.get_citation()
         
-        #firstStudy = dv.get_study_by_hdl("PA0CT")
-        #print firstStudy
-        #print firstStudy.get_list_of_files()
-        #dv.delete_study(firstStudy)
-        #dv.deleteStudy(firstStudy)
-        #dv.addFileToStudy(firstStudy, ADD_PIC_OF_CAT)
-        #dv.addFileToStudy(s, ADD_PIC_OF_CAT)
+        sleep(10) #wait for ingest`
         
-        #print json.dumps(dv.swordConnection.history, indent=True)
+        fs = s.get_files()
+        print "FILES: ", len(fs)
+        s.delete_file(fs[-1])
+        fs = s.get_files()
+        print "FILES: ", len(fs)
+        s.delete_all_files()
+        fs = s.get_files()
+        print "FILES: ", len(fs)
+        
+        s.release()
+        
         print "\n\ndvn_client succeeded"
-        #raise Exception("")
         
     except Exception as e:
         sleep(1)
@@ -84,7 +90,7 @@ def main():
                 dv.swordConnection.history = json.dumps(dv.connection.swordConnection.history, indent=True)
             except:
                 pass
-            print "Call History:\n", dv.connection.swordConnection.history
+            #print "Call History:\n", dv.connection.swordConnection.history
 
 if __name__ == "__main__":
     main()

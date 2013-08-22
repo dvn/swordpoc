@@ -10,12 +10,12 @@ import sword2
 from dataverse import Dataverse
 
 class DvnConnection(object):
-    def __init__(self, username, password, host, cert=None):
+    def __init__(self, username, password, host, cert=None, sdUriOverride=None):
         # Connection Properties
         self.username = username
         self.password = password
         self.host = host
-        self.sdUri = "https://{host}/dvn/api/data-deposit/v1/swordv2/service-document".format(host=self.host)
+        self.sdUri = "https://{host}/dvn/api/data-deposit/v1/swordv2/service-document".format(host=self.host) if not sdUriOverride else sdUriOverride.format(host=self.host)
         self.cert = cert
         
         # Connection Status and SWORD Properties
