@@ -11,6 +11,8 @@ private.*
 # Compiled Python     #
 #######################
 *.py[cod]
+*.pyproj
+*.suo
 
 # Execution Byproducts #
 ########################

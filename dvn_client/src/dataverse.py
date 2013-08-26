@@ -21,7 +21,7 @@ class Dataverse(object):
     
     def is_released(self):
          collectionInfo = self.connection.swordConnection.get_resource(self.collection.href).content
-         status = utils.get_elements(collectionInfo, namespace="", tag="dataverseHasBeenReleased", numberOfElements=1).text
+         status = utils.get_elements(collectionInfo, namespace="http://purl.org/net/sword/terms/state", tag="dataverseHasBeenReleased", numberOfElements=1).text
          return bool(status)
 
     def add_study(self, study):        
