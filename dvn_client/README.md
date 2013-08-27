@@ -26,7 +26,7 @@ Note: you can also run this using the Vagrant file in the root of this repo. The
 	
 ###Setting up a config
 ------------------------
-You need a config.py file to run.  In /swordpoc/dvn_client/src create config.py file and enter the following lines at the moment:
+You need a config.py file to run.  In /swordpoc/dvn_client/src create config.py file and enter the following lines (at the moment):
 
 ```python
 
@@ -41,7 +41,7 @@ You need a config.py file to run.  In /swordpoc/dvn_client/src create config.py 
 ------------------------------------------
 Right now, we only run with settings from the tests.py file. Feel free to edit that.
 
-1. Navigate to dvn\_client/src in the terminal
+1. Navigate to /swordpoc/dvn\_client/src in the terminal
 2. Run the client:
 
     `python dvn_client.py --config config.py --runTests tests.py`
