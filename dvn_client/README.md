@@ -26,7 +26,7 @@ Note: you can also run this using the Vagrant file in the root of this repo. The
 	
 ###Setting up a config
 ------------------------
-You need a config.py file to run.  It needs the following lines at the moment:
+You need a config.py file to run.  In /swordpoc/dvn_client/src create config.py file and enter the following lines at the moment:
 
 ```python
 
