@@ -1,4 +1,13 @@
-#WARNING: The Data Deposit API is currently unstable. Use this client at your own risk. :)
+# DVN Data Deposit API (SWORDv2) Python client
+
+This is sample code that demonstrates how to use the SWORDv2-based Data Deposit API of DVN 3.6 or higher, the documentation for which (including examples with `curl`) can be found at http://thedata.harvard.edu/guides/dataverse-api-main.html#data-deposit-api
+
+The client is written in Python, but please note that a variety of client libraries are available for SWORDv2:
+
+- Python: https://github.com/swordapp/python-client-sword2
+- Java: https://github.com/swordapp/JavaClient2.0
+- Ruby: https://github.com/swordapp/sword2ruby 
+- PHP: https://github.com/swordapp/swordapp-php-library
 
 ###Requirements for dvn-client
 ----------------------------
